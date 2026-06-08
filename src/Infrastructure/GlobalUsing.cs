@@ -1,0 +1,10 @@
+﻿global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using Infrastructure.Database;
+global using Microsoft.EntityFrameworkCore;
+global using Domain.Models;
+global using Application.Settings;
+global using Serilog;
+global using Infrastructure.Database.Services;
+global using Microsoft.AspNetCore.Hosting;
+global using Microsoft.Extensions.Options;
