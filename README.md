@@ -1,4 +1,11 @@
-# Dilovi.App
-Application for calculating residents' payments for the "Dilovi" condominium. 
-Additionally, entering data on water meter readings (and other payments). 
-Integration with PriviatBank.
+# Dilovi Condominium Application
+
+## Description
+Application for calculating residents' payments for the "Dilovi" condominium.
+
+## Features
+- Calculation of residents' payments
+- Entering water meter readings
+- Managing additional payments
+- Integration with PrivatBank
+- Built with .NET 10
