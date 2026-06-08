@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="../Application/Application.csproj" />
+  <Project Path="../Infrastructure/Infrastructure.csproj" />
+  <Project Path="../Migrations.PostgreeSQL/Migrations.PostgreeSQL.csproj" />
+  <Project Path="../Shared.DTOs/Shared.DTOs.csproj" />
+  <Project Path="Condominium.csproj" />
+</Solution>
