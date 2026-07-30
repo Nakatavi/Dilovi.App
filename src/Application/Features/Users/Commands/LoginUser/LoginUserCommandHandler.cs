@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,18 +7,18 @@ namespace Application.Features.Users.Commands.LoginUser;
 
 public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, LoginUserResponse>
 {
-    private readonly IAppDbContext _dbContext;
+    private readonly IUserRepository _userRepository;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
 
-    public LoginUserCommandHandler(IAppDbContext dbContext, IJwtTokenGenerator jwtTokenGenerator)
+    public LoginUserCommandHandler(IUserRepository userRepository, IJwtTokenGenerator jwtTokenGenerator)
     {
-        _dbContext = dbContext;
+        _userRepository = userRepository;
         _jwtTokenGenerator = jwtTokenGenerator;
     }
 
     public async Task<LoginUserResponse> Handle(LoginUserCommand request, CancellationToken cancellationToken)
     {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
+        var user = await _userRepository.GetUserByEmailAsync(request.Email);
 
         if (user is null)
         {
