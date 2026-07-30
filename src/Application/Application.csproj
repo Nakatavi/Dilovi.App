@@ -7,11 +7,24 @@
   </PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="FluentValidation" Version="12.1.1" />
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
 		<PackageReference Include="MediatR" Version="14.1.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Hosting.Server.Abstractions" Version="2.3.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.3.11" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.8" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.8" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Shared.DTOs\Domain.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Features\Users\Queries\" />
+	  <Folder Include="Settings\" />
 	</ItemGroup>
 
 </Project>

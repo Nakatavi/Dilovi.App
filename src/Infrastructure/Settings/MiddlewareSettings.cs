@@ -1,5 +1,5 @@
 ﻿
-namespace Application.Settings;
+namespace Infrastructure.Settings;
 
 public class MiddlewareSettings
 {

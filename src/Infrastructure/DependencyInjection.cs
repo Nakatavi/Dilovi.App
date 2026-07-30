@@ -1,39 +1,40 @@
-﻿using RunMethodsSequentially;
-using static Microsoft.AspNetCore.Hosting.Internal.HostingApplication;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Application.Common.Interfaces;
+using Infrastructure.Authentication;
 
 namespace Infrastructure;
 
 public static class DependencyInjection
 {
-    private static readonly ILogger _logger = Log.ForContext(typeof(DependencyInjection));
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services
-        , IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString =
-            configuration.GetConnectionString("DefaultConnection");
+        services
+            .AddDatabase(configuration)
+            .AddJwtSettings(configuration);
 
-        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-
-        services.AddDbContext<AppDbContext>(options =>
-        {
-            options.UseNpgsql(connectionString, b =>
-            b.MigrationsAssembly("Migrations.PostgreSQL"));
-        });
-
-        services.AddDatabase(configuration);
+        services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
         return services;
     }
+
+    public static IServiceCollection AddJwtSettings(this IServiceCollection services, IConfiguration configuration) => services
+        .Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+
+    public static IServiceCollection AddAppSettings(this IServiceCollection services, IConfiguration configuration) => services;
+
 
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        //Http context must be added befor 
-        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-        var connection = configuration.GetConnectionString("DefaultConnection");
+        services.AddDbContext<AppDbContext>(options =>
+        {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+            var connection = configuration.GetConnectionString("DefaultConnection");
+            options.UseNpgsql(connection, b =>
+            b.MigrationsAssembly("Migrations.PostgreSQL"));
+        });
+
+        services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
         return services;
     }
-
-    //  Add-Migration Init -project Migrations.PostgreSQL -StartupProject Condominium -Context AppDbContext
+    
 }

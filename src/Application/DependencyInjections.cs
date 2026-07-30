@@ -8,12 +8,8 @@ public static class DependencyInjections
         .AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssembly(typeof(ApplicationAssemblyMarker).Assembly);
-        })
-
-        ;
-
-
-    public static IServiceCollection AddAppSettings(this IServiceCollection services, IConfiguration configuration) => services;
+        });
+    
 }
 public class ApplicationAssemblyMarker
 {

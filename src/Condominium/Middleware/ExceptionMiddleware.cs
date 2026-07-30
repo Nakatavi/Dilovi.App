@@ -26,7 +26,7 @@ public class ExceptionMiddleware : IMiddleware
         }
     }
 
-    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
 
@@ -40,15 +40,11 @@ public class ExceptionMiddleware : IMiddleware
 
         context.Response.StatusCode = (int)statusCode;
 
-        var response = new
+        await context.Response.WriteAsJsonAsync(new
         {
             success = false,
-            statusCode = context.Response.StatusCode,
+            statusCode,
             message = exception.Message
-        };
-
-        return context.Response.WriteAsync(
-            JsonSerializer.Serialize(response)
-        );
+        });
     }
 }
