@@ -1,5 +1,8 @@
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Infrastructure.Authentication;
+using Infrastructure.Persistence;
+using Infrastructure.Persistence.Repositories;
 
 namespace Infrastructure;
 
@@ -12,6 +15,9 @@ public static class DependencyInjection
             .AddJwtSettings(configuration);
 
         services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddRepositories();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }
