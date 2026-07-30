@@ -1,9 +1,21 @@
 ﻿
 
-public static class DependencyInjection 
+using Microsoft.OpenApi;
+
+public static class DependencyInjection
 {
-    public static IServiceCollection AddPresentation(this IServiceCollection services,
-          IConfiguration configuration, IHostEnvironment env) => services
-        .AddHttpContextAccessor()
-        .AddScoped<ExceptionMiddleware>();
+    public static IServiceCollection AddPresentation(this IServiceCollection services)
+    {
+        services.AddHttpContextAccessor();
+
+        services.AddScoped<ExceptionMiddleware>();
+
+        services.AddControllers();
+
+        services.AddEndpointsApiExplorer();
+
+        services.AddSwaggerGen();
+
+        return services;
+    }
 }

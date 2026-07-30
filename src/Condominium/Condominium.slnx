@@ -1,7 +1,7 @@
 <Solution>
   <Project Path="../Application/Application.csproj" />
   <Project Path="../Infrastructure/Infrastructure.csproj" />
-  <Project Path="../Migrations.PostgreeSQL/Migrations.PostgreSQL.csproj" />
+  <Project Path="../Migrations.PostgreSQL/Migrations.PostgreSQL.csproj" />
   <Project Path="../Shared.DTOs/Domain.csproj" />
   <Project Path="Condominium.csproj" />
 </Solution>
