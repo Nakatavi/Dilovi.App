@@ -6,7 +6,9 @@ using System.Text;
 
 try
 {
+    Log.Information("Starting up");
     var builder = WebApplication.CreateBuilder(args);
+    Log.Information("WebApplicationBuilder created");
 
     builder.Host.UseSerilog((context, services, config) =>
     {
@@ -14,29 +16,13 @@ try
     });
 
     builder.Services
-        .AddPresentation()
+        .AddPresentation(builder.Configuration)
         .AddInfrastructure(builder.Configuration)
         .AddApplication(builder.Configuration, builder.Environment);
-
-    var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<Infrastructure.Settings.JwtSettings>();
-    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings?.Issuer ?? "Condominium",
-                ValidAudience = jwtSettings?.Audience ?? "Condominium.Client",
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(jwtSettings?.SecretKey ?? "dev-secret-key-that-is-long-enough-for-hs256"))
-            };
-        });
-    builder.Services.AddAuthorization();
+    Log.Information("Services configured");
 
     var app = builder.Build();
+    Log.Information("WebApplication built");
 
     app.UseSwagger();
     app.UseSwaggerUI(options =>
@@ -51,6 +37,7 @@ try
 
     app.MapControllers();
 
+    Log.Information("Starting application");
     app.Run();
 }
 catch (Exception ex)

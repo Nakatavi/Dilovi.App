@@ -6,9 +6,9 @@ namespace Condominium.Controllers;
 [Produces("application/json")]
 public abstract class BaseController : ControllerBase
 {
-    protected readonly IMediator Mediator;
+    protected readonly IMediator _mediator;
     protected BaseController(IMediator mediator)
     {
-        Mediator = mediator;
+        _mediator = mediator;
     }
 }
