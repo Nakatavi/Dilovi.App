@@ -1,28 +1,29 @@
-using Serilog;
 using Infrastructure;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
+using Serilog;
+
+// Bootstrap logger: captures start-up messages before the host-configured logger is built.
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
 try
 {
     Log.Information("Starting up");
     var builder = WebApplication.CreateBuilder(args);
-    Log.Information("WebApplicationBuilder created");
 
-    builder.Host.UseSerilog((context, services, config) =>
-    {
-        config.ReadFrom.Configuration(context.Configuration);
-    });
+    builder.Host.UseSerilog((context, services, config) => config
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services));
 
     builder.Services
         .AddPresentation(builder.Configuration)
         .AddInfrastructure(builder.Configuration)
         .AddApplication(builder.Configuration, builder.Environment);
-    Log.Information("Services configured");
 
     var app = builder.Build();
-    Log.Information("WebApplication built");
+
+    app.UseMiddleware<ExceptionMiddleware>();
+    app.UseSerilogRequestLogging();
 
     app.UseSwagger();
     app.UseSwaggerUI(options =>
@@ -37,12 +38,12 @@ try
 
     app.MapControllers();
 
-    Log.Information("Starting application");
     app.Run();
 }
-catch (Exception ex)
+catch (Exception ex) when (ex is not HostAbortedException) // thrown by design-time tools (dotnet ef)
 {
     Log.Fatal(ex, "Application start-up failed");
+    Environment.ExitCode = 1;
 }
 finally
 {

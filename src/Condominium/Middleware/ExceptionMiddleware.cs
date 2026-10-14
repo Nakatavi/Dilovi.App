@@ -1,10 +1,11 @@
-﻿using System.Net;
-using System.Text.Json;
+using System.Net;
 
 namespace Condominium.Middleware;
 
 public class ExceptionMiddleware : IMiddleware
 {
+    private const string UnexpectedErrorMessage = "An unexpected error occurred.";
+
     private readonly ILogger<ExceptionMiddleware> _logger;
 
     public ExceptionMiddleware(ILogger<ExceptionMiddleware> logger)
@@ -20,31 +21,44 @@ public class ExceptionMiddleware : IMiddleware
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex.Message, "Unhandled exception occurred");
+            var statusCode = GetStatusCode(ex);
 
-            await HandleExceptionAsync(context, ex);
+            if (statusCode == HttpStatusCode.InternalServerError)
+            {
+                _logger.LogError(ex, "Unhandled exception occurred");
+            }
+            else
+            {
+                _logger.LogWarning(ex, "Request failed with {StatusCode}", (int)statusCode);
+            }
+
+            await WriteErrorAsync(context, ex, statusCode);
         }
     }
 
-    private static async Task HandleExceptionAsync(HttpContext context, Exception exception)
+    private static HttpStatusCode GetStatusCode(Exception exception) => exception switch
+    {
+        ArgumentException => HttpStatusCode.BadRequest,
+        KeyNotFoundException => HttpStatusCode.NotFound,
+        UnauthorizedAccessException => HttpStatusCode.Unauthorized,
+        _ => HttpStatusCode.InternalServerError
+    };
+
+    private static async Task WriteErrorAsync(HttpContext context, Exception exception, HttpStatusCode statusCode)
     {
         context.Response.ContentType = "application/json";
-
-        var statusCode = exception switch
-        {
-            ArgumentException => HttpStatusCode.BadRequest,
-            KeyNotFoundException => HttpStatusCode.NotFound,
-            UnauthorizedAccessException => HttpStatusCode.Unauthorized,
-            _ => HttpStatusCode.InternalServerError
-        };
-
         context.Response.StatusCode = (int)statusCode;
+
+        // Do not leak internal details of unexpected errors to the client
+        var message = statusCode == HttpStatusCode.InternalServerError
+            ? UnexpectedErrorMessage
+            : exception.Message;
 
         await context.Response.WriteAsJsonAsync(new
         {
             success = false,
-            statusCode,
-            message = exception.Message
+            statusCode = (int)statusCode,
+            message
         });
     }
 }
