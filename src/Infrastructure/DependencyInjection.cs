@@ -23,8 +23,15 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddJwtSettings(this IServiceCollection services, IConfiguration configuration) => services
-        .Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+    public static IServiceCollection AddJwtSettings(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddOptions<JwtSettings>()
+            .Bind(configuration.GetSection(JwtSettings.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        return services;
+    }
 
     public static IServiceCollection AddAppSettings(this IServiceCollection services, IConfiguration configuration) => services;
 
