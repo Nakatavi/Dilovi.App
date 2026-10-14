@@ -5,7 +5,6 @@ global using Microsoft.EntityFrameworkCore;
 global using Domain.Models;
 global using Serilog;
 global using Infrastructure.Database.Services;
-global using Microsoft.AspNetCore.Hosting;
 global using Microsoft.Extensions.Options;
 global using Infrastructure.Settings;
 global using Microsoft.Extensions.Logging;

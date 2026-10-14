@@ -1,25 +1,23 @@
-﻿
+using FluentValidation.Results;
+
 namespace Application.Features.Responses;
 
 public class ErrorResponse : BaseResponse<string>
 {
-    public ErrorResponse(ErrorMessageLevel level, List<ApiError> errors) : base(null, errors, level)
+    public ErrorResponse(ErrorMessageLevel level, List<ApiError> errors)
+        : base(null, errors, level)
     {
     }
 
-    public ErrorResponse(ErrorMessageLevel level, IEnumerable<FluentValidation.Results.ValidationFailure> errors) : base(null, false)
+    public ErrorResponse(ErrorMessageLevel level, IEnumerable<ValidationFailure> errors)
+        : base(null, errors.Select(ToApiError).ToList(), level)
     {
-        var err = errors.Select(x => new ApiError()
-        {
-            Message = x.ErrorMessage,
-            Code = 400,
-            Item = x.PropertyName
-        }).ToList();
-
-        Errors = new ErrorContainer()
-        {
-            Errors = err,
-            Level = level,
-        };
     }
+
+    private static ApiError ToApiError(ValidationFailure failure) => new()
+    {
+        Message = failure.ErrorMessage,
+        Code = 400,
+        Item = failure.PropertyName
+    };
 }

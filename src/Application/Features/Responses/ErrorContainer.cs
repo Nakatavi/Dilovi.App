@@ -1,15 +1,13 @@
-﻿
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json.Serialization;
 
 namespace Application.Features.Responses;
 
 public class ErrorContainer
 {
-    [JsonProperty(PropertyName = "level")]
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonPropertyName("level")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public ErrorMessageLevel Level { get; set; }
 
-    [JsonProperty(PropertyName = "errors")]
-    public List<ApiError> Errors { get; set; }
+    [JsonPropertyName("errors")]
+    public List<ApiError> Errors { get; set; } = [];
 }
