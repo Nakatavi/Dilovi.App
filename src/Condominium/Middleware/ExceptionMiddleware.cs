@@ -1,4 +1,8 @@
 using System.Net;
+using Application.Enums;
+using Application.Features.Responses;
+using Domain.Common;
+using FluentValidation;
 
 namespace Condominium.Middleware;
 
@@ -18,6 +22,13 @@ public class ExceptionMiddleware : IMiddleware
         try
         {
             await next(context);
+        }
+        catch (ValidationException ex)
+        {
+            _logger.LogWarning("Validation failed: {Errors}", ex.Errors.Select(e => e.ErrorMessage));
+
+            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            await context.Response.WriteAsJsonAsync(new ErrorResponse(ErrorMessageLevel.Error, ex.Errors));
         }
         catch (Exception ex)
         {
@@ -39,6 +50,7 @@ public class ExceptionMiddleware : IMiddleware
     private static HttpStatusCode GetStatusCode(Exception exception) => exception switch
     {
         ArgumentException => HttpStatusCode.BadRequest,
+        DomainException => HttpStatusCode.UnprocessableEntity,
         KeyNotFoundException => HttpStatusCode.NotFound,
         UnauthorizedAccessException => HttpStatusCode.Unauthorized,
         _ => HttpStatusCode.InternalServerError

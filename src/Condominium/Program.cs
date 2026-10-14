@@ -26,6 +26,7 @@ try
     if (app.Environment.IsDevelopment())
     {
         await app.Services.MigrateDatabaseAsync();
+        await app.Services.SeedDevelopmentAdminAsync(app.Configuration);
     }
 
     app.UseMiddleware<ExceptionMiddleware>();

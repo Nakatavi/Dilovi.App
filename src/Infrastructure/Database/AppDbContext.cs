@@ -20,6 +20,10 @@ public class AppDbContext : DbContext, IAppDbContext
     }
 
     public DbSet<User> Users => Set<User>();
+    public DbSet<Apartment> Apartments => Set<Apartment>();
+    public DbSet<MeterReading> MeterReadings => Set<MeterReading>();
+    public DbSet<Tariff> Tariffs => Set<Tariff>();
+    public DbSet<AdditionalCharge> AdditionalCharges => Set<AdditionalCharge>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -6,6 +6,8 @@ namespace Condominium.Controllers;
 [Produces("application/json")]
 public abstract class BaseController : ControllerBase
 {
+    protected const string AdminRoles = nameof(Domain.Enums.Role.SuperAdmin) + "," + nameof(Domain.Enums.Role.Admin);
+
     protected readonly IMediator _mediator;
 
     protected BaseController(IMediator mediator)
