@@ -33,22 +33,29 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddAppSettings(this IServiceCollection services, IConfiguration configuration) => services;
-
-
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
+        services.Configure<MiddlewareSettings>(configuration.GetSection(MiddlewareSettings.SectionName));
+
+        var connectionString = configuration.GetConnectionString("DefaultConnection");
+
         services.AddDbContext<AppDbContext>(options =>
-        {
-            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
-            var connection = configuration.GetConnectionString("DefaultConnection");
-            options.UseNpgsql(connection, b =>
-            b.MigrationsAssembly("Migrations.PostgreSQL"));
-        });
+            options.UseNpgsql(connectionString, npgsql => npgsql.MigrationsAssembly("Migrations.PostgreSQL")));
 
         services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
         return services;
     }
-    
+
+    public static async Task MigrateDatabaseAsync(this IServiceProvider services, CancellationToken cancellationToken = default)
+    {
+        await using var scope = services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        if ((await dbContext.Database.GetPendingMigrationsAsync(cancellationToken)).Any())
+        {
+            Log.Information("Applying database migrations");
+            await dbContext.Database.MigrateAsync(cancellationToken);
+        }
+    }
 }

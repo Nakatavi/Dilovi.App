@@ -17,12 +17,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Shared.DTOs\Domain.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Features\Users\Queries\" />
-	  <Folder Include="Settings\" />
+	  <ProjectReference Include="..\Domain\Domain.csproj" />
 	</ItemGroup>
 
 </Project>

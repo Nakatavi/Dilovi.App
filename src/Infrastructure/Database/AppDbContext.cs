@@ -1,29 +1,36 @@
-﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces;
 
 namespace Infrastructure.Database;
 
-public class AppDbContext:DbContext, IAppDbContext
+public class AppDbContext : DbContext, IAppDbContext
 {
-    private readonly MiddlewareSettings _middlewareConfig;
-    public AppDbContext(DbContextOptions<AppDbContext> options,
-    IOptions<MiddlewareSettings> middlewareConfig)
+    private readonly MiddlewareSettings _middlewareSettings;
+
+    static AppDbContext()
+    {
+        // The existing schema stores DateTime as "timestamp without time zone".
+        // Set once per process, also for design-time tools (dotnet ef).
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    }
+
+    public AppDbContext(DbContextOptions<AppDbContext> options, IOptions<MiddlewareSettings> middlewareSettings)
         : base(options)
     {
-        _middlewareConfig = middlewareConfig.Value;
+        _middlewareSettings = middlewareSettings.Value;
     }
+
+    public DbSet<User> Users => Set<User>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        if (_middlewareConfig.EnableDatabaseLogging)
+        if (_middlewareSettings.EnableDatabaseLogging)
         {
             optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
         }
     }
-
-    public DbSet<User> Users { get; set; } = default!;
-
-
 }

@@ -1,3 +1,4 @@
+using Condominium;
 using Infrastructure;
 using Serilog;
 
@@ -22,6 +23,11 @@ try
 
     var app = builder.Build();
 
+    if (app.Environment.IsDevelopment())
+    {
+        await app.Services.MigrateDatabaseAsync();
+    }
+
     app.UseMiddleware<ExceptionMiddleware>();
     app.UseSerilogRequestLogging();
 
@@ -38,7 +44,7 @@ try
 
     app.MapControllers();
 
-    app.Run();
+    await app.RunAsync();
 }
 catch (Exception ex) when (ex is not HostAbortedException) // thrown by design-time tools (dotnet ef)
 {
@@ -47,5 +53,5 @@ catch (Exception ex) when (ex is not HostAbortedException) // thrown by design-t
 }
 finally
 {
-    Log.CloseAndFlush();
+    await Log.CloseAndFlushAsync();
 }
