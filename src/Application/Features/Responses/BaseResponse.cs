@@ -1,46 +1,32 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Application.Features.Responses;
 
-public class BaseResponse<T> : IActionResult
+public class BaseResponse<T>
 {
-    protected bool IsSuccess;
-
-    public BaseResponse(T data, bool isSuccess = true)
+    public BaseResponse(T? data, bool isSuccess = true)
     {
         Data = data;
         IsSuccess = isSuccess;
         Result = isSuccess ? Constants.Success : Constants.Error;
     }
 
-    protected BaseResponse(T data, List<ApiError> errors, ErrorMessageLevel level, bool isSuccess = false)
+    protected BaseResponse(T? data, List<ApiError>? errors, ErrorMessageLevel level, bool isSuccess = false)
+        : this(data, isSuccess)
     {
-        Data = data;
-        Errors = errors == null ? null : new ErrorContainer() { Errors = errors, Level = level };
-        IsSuccess = isSuccess;
-        Result = isSuccess ? Constants.Success : Constants.Error;
+        Errors = errors is null ? null : new ErrorContainer { Errors = errors, Level = level };
     }
 
+    [JsonIgnore]
+    public bool IsSuccess { get; }
 
+    [JsonPropertyName("result")]
+    public string Result { get; }
 
-    [JsonProperty(PropertyName = "result")]
-    public string Result { get; private set; }
+    [JsonPropertyName("data")]
+    public T? Data { get; set; }
 
-    [JsonProperty(PropertyName = "data")]
-    public T Data { get; set; }
-
-    [JsonProperty(PropertyName = "errors")]
-    public ErrorContainer Errors { get; set; }
-    public Task ExecuteResultAsync(ActionContext context)
-    {
-        if (IsSuccess)
-        {
-            return new OkObjectResult(this).ExecuteResultAsync(context);
-        }
-        else
-        {
-            return new BadRequestObjectResult(this).ExecuteResultAsync(context);
-        }
-    }
+    [JsonPropertyName("errors")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public ErrorContainer? Errors { get; set; }
 }

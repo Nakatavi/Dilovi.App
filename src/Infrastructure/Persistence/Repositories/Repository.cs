@@ -13,29 +13,34 @@ public class Repository<T> : IRepository<T> where T : class
         _context = context;
     }
 
-    public async Task<T?> GetByIdAsync(Guid id)
+    public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
-        return await _context.Set<T>().FindAsync(id);
+        return await _context.Set<T>().FindAsync([id], cancellationToken);
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync()
+    public async Task<IReadOnlyList<T>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _context.Set<T>().ToListAsync();
+        return await _context.Set<T>().AsNoTracking().ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate)
+    public async Task<IReadOnlyList<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
     {
-        return await _context.Set<T>().Where(predicate).ToListAsync();
+        return await _context.Set<T>().AsNoTracking().Where(predicate).ToListAsync(cancellationToken);
     }
 
-    public async Task AddAsync(T entity)
+    public Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
     {
-        await _context.Set<T>().AddAsync(entity);
+        return _context.Set<T>().AnyAsync(predicate, cancellationToken);
     }
 
-    public async Task AddRangeAsync(IEnumerable<T> entities)
+    public async Task AddAsync(T entity, CancellationToken cancellationToken = default)
     {
-        await _context.Set<T>().AddRangeAsync(entities);
+        await _context.Set<T>().AddAsync(entity, cancellationToken);
+    }
+
+    public async Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default)
+    {
+        await _context.Set<T>().AddRangeAsync(entities, cancellationToken);
     }
 
     public void Update(T entity)

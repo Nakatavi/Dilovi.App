@@ -1,7 +1,9 @@
 <Solution>
+  <Project Path="../../tests/Application.UnitTests/Application.UnitTests.csproj" />
+  <Project Path="../../tests/Domain.UnitTests/Domain.UnitTests.csproj" />
   <Project Path="../Application/Application.csproj" />
   <Project Path="../Infrastructure/Infrastructure.csproj" />
   <Project Path="../Migrations.PostgreSQL/Migrations.PostgreSQL.csproj" />
-  <Project Path="../Shared.DTOs/Domain.csproj" />
+  <Project Path="../Domain/Domain.csproj" />
   <Project Path="Condominium.csproj" />
 </Solution>

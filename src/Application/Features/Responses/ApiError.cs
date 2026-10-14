@@ -1,14 +1,19 @@
-﻿using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Application.Features.Responses;
+
 public class ApiError
 {
-    [JsonProperty(PropertyName = "message")]
-    public string Message { get; set; }
-    [JsonProperty(PropertyName = "code")]
+    [JsonPropertyName("message")]
+    public string Message { get; set; } = string.Empty;
+
+    [JsonPropertyName("code")]
     public int Code { get; set; }
-    [JsonProperty(PropertyName = "item")]
-    public string Item { get; set; }
-    [JsonProperty(PropertyName = "id", NullValueHandling = NullValueHandling.Ignore)]
-    public string Id { get; set; }
+
+    [JsonPropertyName("item")]
+    public string Item { get; set; } = string.Empty;
+
+    [JsonPropertyName("id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Id { get; set; }
 }

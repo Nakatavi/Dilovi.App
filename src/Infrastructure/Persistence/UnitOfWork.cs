@@ -2,6 +2,7 @@ using Application.Common.Interfaces;
 
 namespace Infrastructure.Persistence;
 
+// DbContext lifetime is owned by the DI container, so the unit of work must not dispose it
 public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _context;
@@ -11,13 +12,6 @@ public class UnitOfWork : IUnitOfWork
         _context = context;
     }
 
-    public async Task<int> CommitAsync()
-    {
-        return await _context.SaveChangesAsync();
-    }
-
-    public void Dispose()
-    {
-        _context.Dispose();
-    }
+    public Task<int> CommitAsync(CancellationToken cancellationToken = default) =>
+        _context.SaveChangesAsync(cancellationToken);
 }
